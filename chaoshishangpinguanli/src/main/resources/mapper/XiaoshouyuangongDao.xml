@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.XiaoshouyuangongDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.username as username
+        ,a.password as password
+        ,a.xiaoshouyuangong_uuid_number as xiaoshouyuangongUuidNumber
+        ,a.xiaoshouyuangong_name as xiaoshouyuangongName
+        ,a.xiaoshouyuangong_phone as xiaoshouyuangongPhone
+        ,a.xiaoshouyuangong_id_number as xiaoshouyuangongIdNumber
+        ,a.xiaoshouyuangong_photo as xiaoshouyuangongPhoto
+        ,a.sex_types as sexTypes
+        ,a.xiaoshouyuangong_email as xiaoshouyuangongEmail
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.XiaoshouyuangongView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM xiaoshouyuangong  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and a.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and a.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.xiaoshouyuangongUuidNumber != '' and params.xiaoshouyuangongUuidNumber != null and params.xiaoshouyuangongUuidNumber != 'null' ">
+                and a.xiaoshouyuangong_uuid_number like CONCAT('%',#{params.xiaoshouyuangongUuidNumber},'%')
+            </if>
+            <if test=" params.xiaoshouyuangongName != '' and params.xiaoshouyuangongName != null and params.xiaoshouyuangongName != 'null' ">
+                and a.xiaoshouyuangong_name like CONCAT('%',#{params.xiaoshouyuangongName},'%')
+            </if>
+            <if test=" params.xiaoshouyuangongPhone != '' and params.xiaoshouyuangongPhone != null and params.xiaoshouyuangongPhone != 'null' ">
+                and a.xiaoshouyuangong_phone like CONCAT('%',#{params.xiaoshouyuangongPhone},'%')
+            </if>
+            <if test=" params.xiaoshouyuangongIdNumber != '' and params.xiaoshouyuangongIdNumber != null and params.xiaoshouyuangongIdNumber != 'null' ">
+                and a.xiaoshouyuangong_id_number like CONCAT('%',#{params.xiaoshouyuangongIdNumber},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.xiaoshouyuangongEmail != '' and params.xiaoshouyuangongEmail != null and params.xiaoshouyuangongEmail != 'null' ">
+                and a.xiaoshouyuangong_email like CONCAT('%',#{params.xiaoshouyuangongEmail},'%')
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>

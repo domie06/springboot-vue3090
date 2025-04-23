@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.CaigoujinhuoDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shangpin_id as shangpinId
+        ,a.gongyingshang_id as gongyingshangId
+        ,a.caigouyuangong_id as caigouyuangongId
+        ,a.caigoujinhuo_uuid_number as caigoujinhuoUuidNumber
+        ,a.caigoujinhuo_number as caigoujinhuoNumber
+        ,a.caigoujinhuo_content as caigoujinhuoContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.CaigoujinhuoView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,caigouyuangong.caigouyuangong_uuid_number as caigouyuangongUuidNumber
+        ,caigouyuangong.caigouyuangong_name as caigouyuangongName
+        ,caigouyuangong.caigouyuangong_phone as caigouyuangongPhone
+        ,caigouyuangong.caigouyuangong_id_number as caigouyuangongIdNumber
+        ,caigouyuangong.caigouyuangong_photo as caigouyuangongPhoto
+        ,caigouyuangong.caigouyuangong_email as caigouyuangongEmail
+        ,gongyingshang.gongyingshang_name as gongyingshangName
+        ,gongyingshang.gongyingshang_types as gongyingshangTypes
+        ,gongyingshang.gongyingshang_xinyongdengji_types as gongyingshangXinyongdengjiTypes
+        ,gongyingshang.gongyingshang_content as gongyingshangContent
+        ,shangpin.shangpin_uuid_number as shangpinUuidNumber
+        ,shangpin.shangpin_name as shangpinName
+        ,shangpin.shangpin_photo as shangpinPhoto
+        ,shangpin.shangpin_types as shangpinTypes
+        ,shangpin.shangpin_kucun_number as shangpinKucunNumber
+        ,shangpin.shangpin_danwei as shangpinDanwei
+        ,shangpin.shangpin_jinjia_money as shangpinJinjiaMoney
+        ,shangpin.shangpin_shoujia_money as shangpinShoujiaMoney
+        ,shangpin.shangpin_content as shangpinContent
+
+        FROM caigoujinhuo  a
+        left JOIN caigouyuangong caigouyuangong ON a.caigouyuangong_id = caigouyuangong.id
+        left JOIN gongyingshang gongyingshang ON a.gongyingshang_id = gongyingshang.id
+        left JOIN shangpin shangpin ON a.shangpin_id = shangpin.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.shangpinId != null and params.shangpinId != ''">
+                and (
+                    a.shangpin_id = #{params.shangpinId}
+                )
+            </if>
+            <if test="params.gongyingshangId != null and params.gongyingshangId != ''">
+                and (
+                    a.gongyingshang_id = #{params.gongyingshangId}
+                )
+            </if>
+            <if test="params.caigouyuangongId != null and params.caigouyuangongId != ''">
+                and (
+                    a.caigouyuangong_id = #{params.caigouyuangongId}
+                )
+            </if>
+            <if test=" params.caigoujinhuoUuidNumber != '' and params.caigoujinhuoUuidNumber != null and params.caigoujinhuoUuidNumber != 'null' ">
+                and a.caigoujinhuo_uuid_number like CONCAT('%',#{params.caigoujinhuoUuidNumber},'%')
+            </if>
+            <if test="params.caigoujinhuoNumberStart != null and params.caigoujinhuoNumberStart != ''">
+                <![CDATA[  and a.caigoujinhuo_number >= #{params.caigoujinhuoNumberStart}   ]]>
+            </if>
+            <if test="params.caigoujinhuoNumberEnd != null and params.caigoujinhuoNumberEnd != ''">
+                <![CDATA[  and a.caigoujinhuo_number <= #{params.caigoujinhuoNumberEnd}   ]]>
+            </if>
+             <if test="params.caigoujinhuoNumber != null and params.caigoujinhuoNumber != ''">
+                and a.caigoujinhuo_number = #{params.caigoujinhuoNumber}
+             </if>
+            <if test=" params.caigoujinhuoContent != '' and params.caigoujinhuoContent != null and params.caigoujinhuoContent != 'null' ">
+                and a.caigoujinhuo_content like CONCAT('%',#{params.caigoujinhuoContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断采购员工的id不为空 -->
+            <if test=" params.caigouyuangongIdNotNull != '' and params.caigouyuangongIdNotNull != null and params.caigouyuangongIdNotNull != 'null' ">
+                and a.caigouyuangong_id IS NOT NULL
+            </if>
+            <if test=" params.caigouyuangongUuidNumber != '' and params.caigouyuangongUuidNumber != null and params.caigouyuangongUuidNumber != 'null' ">
+                and caigouyuangong.caigouyuangong_uuid_number like CONCAT('%',#{params.caigouyuangongUuidNumber},'%')
+            </if>
+            <if test=" params.caigouyuangongName != '' and params.caigouyuangongName != null and params.caigouyuangongName != 'null' ">
+                and caigouyuangong.caigouyuangong_name like CONCAT('%',#{params.caigouyuangongName},'%')
+            </if>
+            <if test=" params.caigouyuangongPhone != '' and params.caigouyuangongPhone != null and params.caigouyuangongPhone != 'null' ">
+                and caigouyuangong.caigouyuangong_phone like CONCAT('%',#{params.caigouyuangongPhone},'%')
+            </if>
+            <if test=" params.caigouyuangongIdNumber != '' and params.caigouyuangongIdNumber != null and params.caigouyuangongIdNumber != 'null' ">
+                and caigouyuangong.caigouyuangong_id_number like CONCAT('%',#{params.caigouyuangongIdNumber},'%')
+            </if>
+            <if test=" params.caigouyuangongEmail != '' and params.caigouyuangongEmail != null and params.caigouyuangongEmail != 'null' ">
+                and caigouyuangong.caigouyuangong_email like CONCAT('%',#{params.caigouyuangongEmail},'%')
+            </if>
+                <!-- 判断供应商信息的id不为空 -->
+            <if test=" params.gongyingshangIdNotNull != '' and params.gongyingshangIdNotNull != null and params.gongyingshangIdNotNull != 'null' ">
+                and a.gongyingshang_id IS NOT NULL
+            </if>
+            <if test=" params.gongyingshangName != '' and params.gongyingshangName != null and params.gongyingshangName != 'null' ">
+                and gongyingshang.gongyingshang_name like CONCAT('%',#{params.gongyingshangName},'%')
+            </if>
+            <if test="params.gongyingshangTypes != null  and params.gongyingshangTypes != ''">
+                and gongyingshang.gongyingshang_types = #{params.gongyingshangTypes}
+            </if>
+
+            <if test="params.gongyingshangXinyongdengjiTypes != null  and params.gongyingshangXinyongdengjiTypes != ''">
+                and gongyingshang.gongyingshang_xinyongdengji_types = #{params.gongyingshangXinyongdengjiTypes}
+            </if>
+
+            <if test=" params.gongyingshangContent != '' and params.gongyingshangContent != null and params.gongyingshangContent != 'null' ">
+                and gongyingshang.gongyingshang_content like CONCAT('%',#{params.gongyingshangContent},'%')
+            </if>
+                <!-- 判断商品的id不为空 -->
+            <if test=" params.shangpinIdNotNull != '' and params.shangpinIdNotNull != null and params.shangpinIdNotNull != 'null' ">
+                and a.shangpin_id IS NOT NULL
+            </if>
+            <if test=" params.shangpinUuidNumber != '' and params.shangpinUuidNumber != null and params.shangpinUuidNumber != 'null' ">
+                and shangpin.shangpin_uuid_number like CONCAT('%',#{params.shangpinUuidNumber},'%')
+            </if>
+            <if test=" params.shangpinName != '' and params.shangpinName != null and params.shangpinName != 'null' ">
+                and shangpin.shangpin_name like CONCAT('%',#{params.shangpinName},'%')
+            </if>
+            <if test="params.shangpinTypes != null  and params.shangpinTypes != ''">
+                and shangpin.shangpin_types = #{params.shangpinTypes}
+            </if>
+
+            <if test="params.shangpinKucunNumberStart != null  and params.shangpinKucunNumberStart != '' ">
+                <![CDATA[  and shangpin.shangpin_kucun_number >= #{params.shangpinKucunNumberStart}   ]]>
+            </if>
+            <if test="params.shangpinKucunNumberEnd != null  and params.shangpinKucunNumberEnd != '' ">
+                <![CDATA[  and shangpin.shangpin_kucun_number <= #{params.shangpinKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.shangpinKucunNumber != null  and params.shangpinKucunNumber != '' ">
+                and shangpin.shangpin_kucun_number = #{params.shangpinKucunNumber}
+            </if>
+            <if test=" params.shangpinDanwei != '' and params.shangpinDanwei != null and params.shangpinDanwei != 'null' ">
+                and shangpin.shangpin_danwei like CONCAT('%',#{params.shangpinDanwei},'%')
+            </if>
+            <if test="params.shangpinJinjiaMoneyStart != null ">
+                <![CDATA[  and shangpin.shangpin_jinjia_money >= #{params.shangpinJinjiaMoneyStart}   ]]>
+            </if>
+            <if test="params.shangpinJinjiaMoneyEnd != null ">
+                <![CDATA[  and shangpin.shangpin_jinjia_money <= #{params.shangpinJinjiaMoneyEnd}   ]]>
+            </if>
+            <if test="params.shangpinShoujiaMoneyStart != null ">
+                <![CDATA[  and shangpin.shangpin_shoujia_money >= #{params.shangpinShoujiaMoneyStart}   ]]>
+            </if>
+            <if test="params.shangpinShoujiaMoneyEnd != null ">
+                <![CDATA[  and shangpin.shangpin_shoujia_money <= #{params.shangpinShoujiaMoneyEnd}   ]]>
+            </if>
+            <if test=" params.shangpinContent != '' and params.shangpinContent != null and params.shangpinContent != 'null' ">
+                and shangpin.shangpin_content like CONCAT('%',#{params.shangpinContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shangpin.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shangpin.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
